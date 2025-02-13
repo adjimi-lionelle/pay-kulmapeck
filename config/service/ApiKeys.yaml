@@ -1,0 +1,5 @@
+services:
+    App\Service\ApiKeys:
+        arguments:
+            $publicKey: '%env(COOL_PAY_PUBLIC_KEY)%'
+            $privateKey: '%env(COOL_PAY_PRIVATE_KEY)%'
