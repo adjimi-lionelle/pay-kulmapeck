@@ -5182,7 +5182,7 @@ __webpack_require__.r(__webpack_exports__);
 
 class ConfigService {
     constructor() {
-        this.baseUrl = 'https://pay.staging-kulmapeck.online/api/app/'; // Set your base API URL here
+        this.baseUrl = 'http://145.223.98.53:8085/api/app/'; // Set your base API URL here
     }
     //private baseUrl = 'http://127.0.0.1:8000/api/app/'; // Set your base API URL here
     getApiUrl() {
