@@ -16,6 +16,8 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            stateless: true
+            jwt: ~   
 
         api:
             pattern: ^/api
@@ -33,7 +35,7 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
-        - { path: ^/ap/app, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/app, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:

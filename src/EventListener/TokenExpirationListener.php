@@ -98,9 +98,9 @@ class TokenExpirationListener implements EventSubscriberInterface
         $authorizationHeader = $request->headers->get('Authorization');
 
         if (!$authorizationHeader || !preg_match('/Bearer\s+(.*)/', $authorizationHeader, $matches)) {
+           // var_dump('Aucun token reçu ou mal formé');
             return null;
         }
-
         $token = $matches[1];
 
         // Validate the token's expiration
