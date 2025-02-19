@@ -36,7 +36,7 @@ security:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
        # - { path: ^/ap/app, roles: IS_AUTHENTICATED_FULLY }
-         - { path: ^/api/app/transaction/stat, roles: ROLE_USER }
+         - { path: ^/api/app/transaction/stat, roles: ROLE_ADMIN }
 
 when@test:
     security:
