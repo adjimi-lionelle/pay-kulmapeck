@@ -186,6 +186,8 @@ class AppTransactionController extends AbstractController
     if (!$user) {
         return new JsonResponse(["error" => "User not authenticated"], 403);
     }
+    return new JsonResponse(["message" => "User authenticated", "user" => $user->getUserIdentifier(), "roles" => $user->getRoles()]);
+
 
         $currentDate = new \DateTimeImmutable();
         $currentWeekStartDate = $currentDate->modify('last monday')->setTime(0, 0, 0);
