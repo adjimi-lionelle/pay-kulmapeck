@@ -3019,7 +3019,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-class AuthService {
+/*class AuthService {
     constructor(http, configService) {
         this.http = http;
         this.configService = configService;
@@ -3050,7 +3050,47 @@ class AuthService {
         }
         return false;
     }
+}*/
+
+class AuthService {
+    constructor(http, configService) {
+        this.http = http;
+        this.configService = configService;
+        this.apiUrl = configService.getApiUrl();
+    }
+
+    login(email, password) {
+        const data = { email, password };
+        return this.http.post(`${this.apiUrl}login`, data);
+    }
+
+    setToken(token) {
+        localStorage.setItem("token", token);
+    }
+
+    getToken() {
+        return localStorage.getItem("token") || null;
+    }
+
+    removeToken() {
+        localStorage.removeItem("token");
+    }
+
+    isAuthenticated() {
+        return this.getToken() !== null;
+    }
+
+    //Nouvelle méthode : récupérer dynamiquement le token et générer les en-têtes
+    getHeaders() {
+        return new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__.HttpHeaders({
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.getToken()}`
+        });
+    }
+
 }
+
+
 AuthService.ɵfac = function AuthService_Factory(t) { return new (t || AuthService)(_angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_common_http__WEBPACK_IMPORTED_MODULE_1__.HttpClient), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_services_config_service__WEBPACK_IMPORTED_MODULE_0__.ConfigService)); };
 AuthService.ɵprov = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵdefineInjectable"]({ token: AuthService, factory: AuthService.ɵfac, providedIn: "root" });
 
