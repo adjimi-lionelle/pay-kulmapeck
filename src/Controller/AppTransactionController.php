@@ -181,6 +181,11 @@ class AppTransactionController extends AbstractController
     ): JsonResponse {
 
         // $transactionRepository = $entityManager->getRepository(AppTransaction::class);
+        $user = $this->getUser(); // Récupère l'utilisateur connecté
+
+    if (!$user) {
+        return new JsonResponse(["error" => "User not authenticated"], 403);
+    }
 
         $currentDate = new \DateTimeImmutable();
         $currentWeekStartDate = $currentDate->modify('last monday')->setTime(0, 0, 0);
