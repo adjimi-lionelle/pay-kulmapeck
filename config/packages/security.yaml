@@ -29,11 +29,6 @@ security:
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
-        api:
-            pattern: ^/api/
-            stateless: true
-            jwt: ~
-
         main:
             lazy: true
             provider: app_users_provider
