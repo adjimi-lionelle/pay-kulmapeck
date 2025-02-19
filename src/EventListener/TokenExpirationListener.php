@@ -87,7 +87,7 @@ class TokenExpirationListener implements EventSubscriberInterface
         }
     }
 
-    private function isUserAuthenticated(Request $request)
+   /* private function isUserAuthenticated(Request $request)
     {
         // Retrieve the bearer token from the Authorization header
         $authorizationHeader = $request->headers->get('Authorization');
@@ -95,7 +95,26 @@ class TokenExpirationListener implements EventSubscriberInterface
             return false;
         }
         return true;
+    }*/
+
+    private function isUserAuthenticated(Request $request)
+{
+    $authorizationHeader = $request->headers->get('Authorization');
+
+    // Ajouter un log pour voir la valeur de l'en-tête Authorization
+    if (!$authorizationHeader) {
+        error_log("JWT Authentication: Authorization header missing.");
+        return false;
     }
+
+    if (!preg_match('/Bearer\s+(.*)/', $authorizationHeader, $matches)) {
+        error_log("JWT Authentication: Authorization header format incorrect. Received: " . $authorizationHeader);
+        return false;
+    }
+
+    error_log("JWT Authentication: Token detected.");
+    return true;
+}
 
     private function isSessionTokenExpired(Request $request)
     {
