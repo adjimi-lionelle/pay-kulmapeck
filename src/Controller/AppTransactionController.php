@@ -184,7 +184,7 @@ class AppTransactionController extends AbstractController
         $user = $this->getUser(); // Récupère l'utilisateur connecté
 
     if (!$user) {
-        return new JsonResponse(["error" => "User not authenticated"], 403);
+        return new JsonResponse(["error" => "User non authentifié"], 403);
     }
     return new JsonResponse(["message" => "User authenticated", "user" => $user->getUserIdentifier(), "roles" => $user->getRoles()]);
 
