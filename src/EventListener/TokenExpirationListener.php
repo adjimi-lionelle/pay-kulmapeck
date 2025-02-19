@@ -98,6 +98,22 @@ class TokenExpirationListener implements EventSubscriberInterface
     }*/
 
     private function isUserAuthenticated(Request $request)
+{
+    $authorizationHeader = $request->headers->get('Authorization');
+    
+    if (!$authorizationHeader || !preg_match('/Bearer\s+(.*)/', $authorizationHeader, $matches)) {
+        error_log(" Aucun token trouvé ou format incorrect !");
+        return false;
+    }
+
+    $token = $matches[1];
+    error_log("Token reçu: " . $token);
+
+    return true;
+}
+
+
+   /* private function isUserAuthenticated(Request $request)
     {
         // Afficher tous les en-têtes pour voir si "Authorization" est bien reçu
         foreach ($request->headers->all() as $key => $value) {
@@ -114,7 +130,7 @@ class TokenExpirationListener implements EventSubscriberInterface
     
         error_log("JWT Authentication: Token detected.");
         return true;
-    }
+    }*/
     
 
     private function isSessionTokenExpired(Request $request)
