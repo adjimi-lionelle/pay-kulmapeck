@@ -11,6 +11,7 @@ use App\Repository\AppUsersRepository;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Psr\Log\LoggerInterface;
 
 
 class TokenExpirationListener implements EventSubscriberInterface
@@ -23,11 +24,13 @@ class TokenExpirationListener implements EventSubscriberInterface
         TokenStorageInterface $tokenStorage,
         JWTTokenManagerInterface $jwtTokenManager,
         AppUsersRepository $userRepository,
-        ApiKeys $apiKeys
+        ApiKeys $apiKeys,
+        LoggerInterface $logger
     ) {
         $this->tokenStorage = $apiKeys->getAPIToken();
         $this->jwtTokenManager = $jwtTokenManager;
         $this->userRepository = $userRepository;
+        $this->logger = $logger;
     }
 
     public function onKernelRequest(RequestEvent $event)
