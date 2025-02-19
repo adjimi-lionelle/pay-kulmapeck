@@ -62,4 +62,19 @@ class AuthController extends AbstractController
     
     }
 
+    #[Route('/debug', name: 'debug_route', methods: ['GET'])]
+    public function debug(Security $security): JsonResponse
+    {
+        $user = $security->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'User pas authetifié'], 403);
+        }
+
+        return new JsonResponse([
+            'message' => 'User authenticated',
+            'user' => $user->getUserIdentifier(),
+            'roles' => $user->getRoles(),
+        ]);
+    }
+
 }
