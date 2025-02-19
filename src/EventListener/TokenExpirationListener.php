@@ -65,6 +65,7 @@ class TokenExpirationListener implements EventSubscriberInterface
             }
             return;
         }
+        $this->logger->info('Authorization Header: ' . $request->headers->get('Authorization'));
 
         // Check if the user is authenticated with a valid token
         if (!$this->isUserAuthenticated($request)) {
