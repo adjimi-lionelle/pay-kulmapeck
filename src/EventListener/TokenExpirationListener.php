@@ -36,6 +36,21 @@ class TokenExpirationListener
         }
     }
 
+    private function isUserAuthenticated(Request $request)
+{
+    $authorizationHeader = $request->headers->get('Authorization');
+
+    // Ajoute un log pour vérifier si le token est bien reçu
+    error_log('Token reçu: ' . $authorizationHeader);
+
+    if (!$authorizationHeader || !preg_match('/Bearer\s+(.*)/', $authorizationHeader, $matches)) {
+        return false;
+    }
+    
+    return true;
+}
+
+
     public static function getSubscribedEvents()
     {
         return [

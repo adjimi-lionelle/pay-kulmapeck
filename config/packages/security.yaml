@@ -14,7 +14,7 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         api:
-            pattern: ^/api/
+            pattern: ^/api
             stateless: true
             provider: app_user_provider
             jwt: ~
@@ -37,7 +37,7 @@ security:
 
     access_control:
         - { path: ^/api/app/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/app, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:
