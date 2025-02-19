@@ -5200,7 +5200,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-class AuthServiceService {
+/*class AuthServiceService {
     constructor(configService, httpClient) {
         this.configService = configService;
         this.httpClient = httpClient;
@@ -5216,7 +5216,36 @@ class AuthServiceService {
     getUser() {
         return this.httpClient.get(`${this.apiUrl}users`, { headers: this.headers });
     }
+}*/
+class AuthServiceService {
+    constructor(configService, httpClient) {
+        this.configService = configService;
+        this.httpClient = httpClient;
+        this.apiUrl = configService.getApiUrl();
+    }
+
+    //  Génère dynamiquement les headers avant chaque requête
+    getHeaders() {
+        const token = this.configService.getToken(); // Toujours récupérer le token actuel
+        console.log(" Mise à jour des headers avec le token :", token);
+
+        return new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__.HttpHeaders({
+            'Content-Type': 'application/json',
+            Authorization: token ? `Bearer ${token}` : '' // Évite d'envoyer "Bearer null"
+        });
+    }
+
+    //  Inscription d'un utilisateur avec token mis à jour
+    register(user) {
+        return this.httpClient.post(`${this.apiUrl}users/new`, user, { headers: this.getHeaders() });
+    }
+
+    //  Récupérer les infos utilisateur avec token mis à jour
+    getUser() {
+        return this.httpClient.get(`${this.apiUrl}users`, { headers: this.getHeaders() });
+    }
 }
+
 AuthServiceService.ɵfac = function AuthServiceService_Factory(t) { return new (t || AuthServiceService)(_angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_services_config_service__WEBPACK_IMPORTED_MODULE_0__.ConfigService), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_common_http__WEBPACK_IMPORTED_MODULE_1__.HttpClient)); };
 AuthServiceService.ɵprov = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵdefineInjectable"]({ token: AuthServiceService, factory: AuthServiceService.ɵfac, providedIn: "root" });
 
