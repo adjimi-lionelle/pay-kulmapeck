@@ -3065,6 +3065,59 @@ class AuthService {
     }
 
     setToken(token) {
+        console.log("Token enregistré:", token);
+        localStorage.setItem("token", token);
+    }
+
+    getToken() {
+        const token = localStorage.getItem("token") || null;
+        console.log("Token récupéré:", token);
+        return token;
+    }
+
+    removeToken() {
+        console.log("Token supprimé.");
+        localStorage.removeItem("token");
+    }
+
+    isAuthenticated() {
+        const authStatus = this.getToken() !== null;
+        console.log("Utilisateur authentifié ?", authStatus);
+        return authStatus;
+    }
+
+    //  Nouvelle méthode : récupérer dynamiquement le token et générer les en-têtes
+    getHeaders() {
+        const token = this.getToken();
+        if (!token) {
+            console.warn("⚠️ Aucun token trouvé dans localStorage !");
+        }
+
+        return new _angular_common_http__WEBPACK_IMPORTED_MODULE_1__.HttpHeaders({
+            'Content-Type': 'application/json',
+            Authorization: token ? `Bearer ${token}` : '' // N'ajoute pas "Bearer null"
+        });
+    }
+
+    //  Nouvelle méthode pour faire des requêtes GET protégées
+    requestWithAuth(endpoint) {
+        return this.http.get(`${this.apiUrl}${endpoint}`, { headers: this.getHeaders() });
+    }
+}
+
+/*class AuthService {
+    constructor(http, configService) {
+        this.http = http;
+        this.configService = configService;
+        this.apiUrl = configService.getApiUrl();
+    }
+
+    login(email, password) {
+        const data = { email, password };
+        return this.http.post(`${this.apiUrl}login`, data);
+    }
+
+    setToken(token) {
         localStorage.setItem("token", token);
     }
 
@@ -3088,7 +3141,7 @@ class AuthService {
         });
     }
 
-}
+}*/
 
 
 AuthService.ɵfac = function AuthService_Factory(t) { return new (t || AuthService)(_angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_common_http__WEBPACK_IMPORTED_MODULE_1__.HttpClient), _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_services_config_service__WEBPACK_IMPORTED_MODULE_0__.ConfigService)); };
