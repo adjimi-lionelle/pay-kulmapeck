@@ -22,21 +22,27 @@ security:
         login:
             pattern: ^/api/app/login
             stateless: true
-            provider: app_user_provider
             json_login:
                 check_path: /api/app/login
                 username_path: email
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure    
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        api:
+            pattern: ^/api/
+            stateless: true
+            jwt: ~
 
         main:
             lazy: true
-            provider: app_user_provider
+            provider: app_users_provider
+            stateless: true
+            jwt: ~
 
     access_control:
-        - { path: ^/api/app/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/app, roles: ROLE_USER }
+        - { path: ^/api/app/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/app, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:
