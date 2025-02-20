@@ -26,6 +26,7 @@ class PaymentController extends AbstractController
 
     private $percentageInt;
     private $percentageOut;
+    private $percentageOutTeach;
 
     public function __construct(ApiKeys $apiKeys = null)
     {
@@ -486,7 +487,7 @@ class PaymentController extends AbstractController
             return new JsonResponse(['message' => 'HTTP request failed'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
+/*
     #[Route('/email', name: 'balance', methods: ['POST'])]
     function emailSender()
     {
@@ -528,6 +529,6 @@ class PaymentController extends AbstractController
         } else {
             return new JsonResponse('Email could not be sent. Mailer Error: ' . $mail->ErrorInfo);
         }
-    }
+    }*/
 
 }

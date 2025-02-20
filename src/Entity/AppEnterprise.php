@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\AppEnterpriseRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AppEnterpriseRepository::class)]
@@ -27,9 +29,12 @@ class AppEnterprise
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createAt = null;
-
+/*
     #[ORM\OneToMany(mappedBy: 'enterprise', targetEntity: AppBank::class)]
-    private Collection $bank;
+    private Collection $bank;*/
+    #[ORM\OneToMany(mappedBy: 'enterprise', targetEntity: AppTransaction::class)]
+    private Collection $transactions;
+
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $omNumber = null;
@@ -42,7 +47,7 @@ class AppEnterprise
 
     public function __construct()
     {
-        $this->bank = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -110,35 +115,6 @@ class AppEnterprise
         return $this;
     }
 
-    /**
-     * @return Collection<int, AppTransaction>
-     */
-    public function getBank(): Collection
-    {
-        return $this->bank;
-    }
-
-    public function addBank(AppTransaction $bank): static
-    {
-        if (!$this->bank->contains($bank)) {
-            $this->bank->add($bank);
-            $bank->setEnterprise($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBank(AppTransaction $bank): static
-    {
-        if ($this->bank->removeElement($bank)) {
-            // set the owning side to null (unless already changed)
-            if ($bank->getEnterprise() === $this) {
-                $bank->setEnterprise(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function getOmNumber(): ?string
     {
@@ -175,4 +151,34 @@ class AppEnterprise
 
         return $this;
     }
+
+    /**
+ * @return Collection<int, AppTransaction>
+ */
+public function getTransactions(): Collection
+{
+    return $this->transactions;
+}
+
+public function addTransaction(AppTransaction $transaction): static
+{
+    if (!$this->transactions->contains($transaction)) {
+        $this->transactions->add($transaction);
+        $transaction->setEnterprise($this);
+    }
+
+    return $this;
+}
+
+public function removeTransaction(AppTransaction $transaction): static
+{
+    if ($this->transactions->removeElement($transaction)) {
+        // Set the owning side to null (unless already changed)
+        if ($transaction->getEnterprise() === $this) {
+            $transaction->setEnterprise(null);
+        }
+    }
+
+    return $this;
+}
 }

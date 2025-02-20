@@ -41,6 +41,7 @@ class AppUsers implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $enable = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true)] 
     private ?AppEnterprise $userEnterprise = null;
 
     #[ORM\Column(length: 255)]

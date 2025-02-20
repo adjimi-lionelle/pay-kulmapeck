@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\AppTransactionRepository;
 use Doctrine\DBAL\Types\Types;
+use App\Utils;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AppTransactionRepository::class)]
@@ -26,7 +27,7 @@ class AppTransaction
     #[ORM\Column]
     private ?\DateTimeImmutable $updateAt = null;
 
-    #[ORM\ManyToOne(inversedBy: 'bank')]
+    #[ORM\ManyToOne(inversedBy: 'transactions')]
     private ?AppEnterprise $enterprise = null;
 
     #[ORM\ManyToOne(inversedBy: 'bankMoney')]
@@ -263,4 +264,6 @@ class AppTransaction
 
         return $this;
     }
+
+
 }
