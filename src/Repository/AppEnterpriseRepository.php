@@ -13,11 +13,11 @@ class AppEnterpriseRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, AppEntreprise::class);
+        parent::__construct($registry, AppEnterprise::class);
     }
 
     //    /**
-    //     * @return AppEntreprise[] Returns an array of AppEntreprise objects
+    //     * @return AppEnterprise[] Returns an array of AppEnterprise objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -31,7 +31,7 @@ class AppEnterpriseRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?AppEntreprise
+    //    public function findOneBySomeField($value): ?AppEnterprise
     //    {
     //        return $this->createQueryBuilder('a')
     //            ->andWhere('a.exampleField = :val')
