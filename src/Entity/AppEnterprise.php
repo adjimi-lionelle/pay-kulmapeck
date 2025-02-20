@@ -28,7 +28,7 @@ class AppEnterprise
     #[ORM\Column]
     private ?\DateTimeImmutable $createAt = null;
 
-    #[ORM\OneToMany(mappedBy: 'enterprise', targetEntity: AppTransaction::class)]
+    #[ORM\OneToMany(mappedBy: 'enterprise', targetEntity: AppBank::class)]
     private Collection $bank;
 
     #[ORM\Column(length: 255, nullable: true)]
