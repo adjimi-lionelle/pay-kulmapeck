@@ -181,12 +181,12 @@ class AppTransactionController extends AbstractController
     ): JsonResponse {
 
         // $transactionRepository = $entityManager->getRepository(AppTransaction::class);
-        $user = $this->getUser(); // Récupère l'utilisateur connecté
+     /*   $user = $this->getUser(); // Récupère l'utilisateur connecté
 
     if (!$user) {
         return new JsonResponse(["error" => "User non authentifié"], 403);
     }
-    return new JsonResponse(["message" => "User authenticated", "user" => $user->getUserIdentifier(), "roles" => $user->getRoles()]);
+    return new JsonResponse(["message" => "User authenticated", "user" => $user->getUserIdentifier(), "roles" => $user->getRoles()]);*/
 
 
         $currentDate = new \DateTimeImmutable();
