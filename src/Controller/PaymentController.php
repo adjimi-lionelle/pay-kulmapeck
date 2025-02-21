@@ -450,7 +450,7 @@ function callBack(
    
     $jsonData = json_decode($request->getContent(), true);
 
-    var_dump("Callback reçu avec JSON : " . $jsonData);
+   // var_dump("Callback reçu avec JSON : " . $jsonData);
     if ($jsonData === null) {
         return new JsonResponse(['message' => 'Invalid JSON data'], Response::HTTP_BAD_REQUEST);
     }
