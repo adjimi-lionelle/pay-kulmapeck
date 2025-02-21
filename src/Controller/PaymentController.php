@@ -454,10 +454,10 @@ function callBack(
     $senderIp = $request->getClientIp();
     $expectedIp = '15.236.140.89';
 
-    error_log('IP reçue du callback : ' . $senderIp);
+    var_dump('IP reçue du callback : ' . $senderIp);
 
     if ($senderIp !== $expectedIp) {
-        error_log('IP non autorisée : ' . $senderIp);
+        var_dump('IP non autorisée : ' . $senderIp);
         return new JsonResponse(['message' => 'IP de l\'expéditeur non autorisé'], Response::HTTP_FORBIDDEN);
     }
 
