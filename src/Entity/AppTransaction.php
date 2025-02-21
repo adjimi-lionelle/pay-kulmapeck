@@ -33,6 +33,7 @@ class AppTransaction
     #[ORM\ManyToOne(inversedBy: 'bankMoney')]
     private ?AppBank $bank = null;
 
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $sender = null;
 
@@ -121,7 +122,7 @@ class AppTransaction
     }
 
     
-    public function getEnterprise(): ?AppEnterprise
+    /*public function getEnterprise(): ?AppEnterprise
     {
         return $this->enterprise;
     }
@@ -142,6 +143,28 @@ class AppTransaction
     {
         $this->bank = $bank;
 
+        return $this;
+    }*/
+
+    public function getEnterprise(): ?AppEnterprise
+    {
+        return $this->enterprise;
+    }
+
+    public function setEnterprise(?AppEnterprise $enterprise): static
+    {
+        $this->enterprise = $enterprise;
+        return $this;
+    }
+
+    public function getBank(): ?AppBank
+    {
+        return $this->bank;
+    }
+
+    public function setBank(?AppBank $bank): static
+    {
+        $this->bank = $bank;
         return $this;
     }
 

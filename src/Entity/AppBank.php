@@ -25,7 +25,7 @@ class AppBank
     private ?bool $enable = null;
 
     #[ORM\OneToMany(mappedBy: 'bank', targetEntity: AppTransaction::class)]
-private Collection $bankMoney;
+    private Collection $bankMoney;
     
     public function __construct()
     {
