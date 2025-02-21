@@ -447,55 +447,25 @@ function callBack(
     EntityManagerInterface $entityManager,
     AppTransactionRepository $appTransactionRepository
 ) {
-    // Log: Callback reçu
-    //var_dump('Callback reçu !');
-
-    // Vérification de l'IP de CoolPay
-   /* $senderIp = $request->getClientIp();
-    $expectedIp = '15.236.140.89';
-
-    //var_dump('IP reçue du callback : ' . $senderIp);
-
-    if ($senderIp !== $expectedIp) {
-        return new JsonResponse(['message' => 'IP de l\'expéditeur non autorisé'], Response::HTTP_FORBIDDEN);
-    }*/
-    /*$senderIp = $request->getClientIp();
-    $allowedIps = [
-        '15.236.140.89', // IPv4
-        '2a02:4780:41:dbbd::1' // IPv6
-    ];
-    
-    if (!in_array($senderIp, $allowedIps)) {
-        //var_dump('IP non autorisée : ' . $senderIp);
-        return new JsonResponse(['message' => 'IP de l\'expéditeur non autorisée'], Response::HTTP_FORBIDDEN);
-    }*/
-
-    // Décodage des données JSON reçues
+   
     $jsonData = json_decode($request->getContent(), true);
-    //var_dump('JSON Callback reçu : ' . json_encode($jsonData));
 
+    var_dump("Callback reçu avec JSON : " . $jsonData);
     if ($jsonData === null) {
-        //var_dump('Données JSON invalides !');
         return new JsonResponse(['message' => 'Invalid JSON data'], Response::HTTP_BAD_REQUEST);
     }
 
-    // Vérification de la présence du champ 'app_transaction_ref'
     if (!isset($jsonData['app_transaction_ref'])) {
-        //var_dump('Clé app_transaction_ref absente dans JSON !');
         return new JsonResponse(['message' => 'Missing app_transaction_ref in JSON'], Response::HTTP_BAD_REQUEST);
     }
 
-    // Recherche de la transaction dans la base
-    //var_dump('Recherche transaction avec ref : ' . $jsonData['app_transaction_ref']);
     $transaction = $appTransactionRepository->findOneBy(['app_transaction_ref' => $jsonData['app_transaction_ref']]);
 
     if ($transaction === null) {
-        //var_dump('Transaction introuvable en base avec ref : ' . $jsonData['app_transaction_ref']);
         return new JsonResponse(['message' => 'Invalid app_transaction_ref data'], Response::HTTP_BAD_REQUEST);
     }
 
     // Mise à jour du statut de la transaction
-    //var_dump('Ancien statut : ' . $transaction->getStatus());
     $transaction->setStatus($jsonData['transaction_status']);
     $transaction->setUpdateAt(new \DateTimeImmutable());
 
