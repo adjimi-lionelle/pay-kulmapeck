@@ -60,13 +60,16 @@ class TokenExpirationListener implements EventSubscriberInterface
         if (strpos($pathInfo, '/api/pay') === 0) {
 
             $headerValue = $request->headers->get('X-PRIVATE-KEY');
-            var_dump("Clé privée reçue : " . $headerValue);
-            var_dump("Clé privée attendue : " . $this->tokenStorage);
+
             // Compare the header value with the stored private key
-            if ($headerValue !== $this->tokenStorage) {
+           /* if ($headerValue !== $this->tokenStorage) {
                 // Unauthorized response
                 throw new AccessDeniedHttpException('Access Denied: User no connect.');
+            }*/
+            if ($headerValue !== $this->tokenStorage) {
+                throw new AccessDeniedHttpException('Access Denied: User no connect. Clé reçue: ' . $headerValue . ' | Clé attendue: ' . $this->tokenStorage);
             }
+            
             return;
         }
         $authHeader = $request->headers->get('Authorization', 'No Authorization Header');
