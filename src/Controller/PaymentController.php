@@ -458,7 +458,7 @@ function callBack(
 
     if ($senderIp !== $expectedIp) {
         error_log('IP non autorisée : ' . $senderIp);
-        return new JsonResponse(['message' => 'Unauthorized sender IP'], Response::HTTP_FORBIDDEN);
+        return new JsonResponse(['message' => 'IP de l\'expéditeur non autorisé'], Response::HTTP_FORBIDDEN);
     }
 
     // Décodage des données JSON reçues
