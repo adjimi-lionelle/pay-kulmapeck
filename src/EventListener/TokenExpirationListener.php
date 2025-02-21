@@ -60,8 +60,8 @@ class TokenExpirationListener implements EventSubscriberInterface
         if (strpos($pathInfo, '/api/pay') === 0) {
 
             $headerValue = $request->headers->get('X-PRIVATE-KEY');
-            error_log("Clé privée reçue : " . $headerValue);
-            error_log("Clé privée attendue : " . $this->tokenStorage);
+            var_dump("Clé privée reçue : " . $headerValue);
+            var_dump("Clé privée attendue : " . $this->tokenStorage);
             // Compare the header value with the stored private key
             if ($headerValue !== $this->tokenStorage) {
                 // Unauthorized response
