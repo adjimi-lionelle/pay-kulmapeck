@@ -459,7 +459,7 @@ function callBack(
     if ($senderIp !== $expectedIp) {
         return new JsonResponse(['message' => 'IP de l\'expéditeur non autorisé'], Response::HTTP_FORBIDDEN);
     }*/
-    $senderIp = $request->getClientIp();
+    /*$senderIp = $request->getClientIp();
     $allowedIps = [
         '15.236.140.89', // IPv4
         '2a02:4780:41:dbbd::1' // IPv6
@@ -468,7 +468,7 @@ function callBack(
     if (!in_array($senderIp, $allowedIps)) {
         var_dump('IP non autorisée : ' . $senderIp);
         return new JsonResponse(['message' => 'IP de l\'expéditeur non autorisée'], Response::HTTP_FORBIDDEN);
-    }
+    }*/
 
     // Décodage des données JSON reçues
     $jsonData = json_decode($request->getContent(), true);
