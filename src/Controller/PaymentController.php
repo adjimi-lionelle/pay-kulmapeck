@@ -78,17 +78,6 @@ class PaymentController extends AbstractController
             return $this->json(['error' => 'This Enterprise doesnt exists '], Response::HTTP_BAD_REQUEST);
         }
 
-        /*   $data = [
-        "transaction_amount" => 500,
-        "transaction_currency" => "XAF",
-        "transaction_reason" => "Customer refund",
-        "transaction_operator" => "CM_OM",
-        "app_transaction_ref" => "refund_123",
-        "customer_phone_number" => "699009900",
-        "customer_name" => "Bob MARLEY",
-        "customer_email" => "bob@mail.com",
-        "customer_lang" => "en",
-        ];*/
 
         $transaction->setAmount($requestData['transaction_amount']);
         $transaction->setTransactionCurrency($requestData['transaction_currency']);
@@ -398,7 +387,7 @@ class PaymentController extends AbstractController
 
         ];
     }
-
+/*
     #[Route('/callback', name: 'callback', methods: ['POST'])]
     function callBack(
         Request $request,
@@ -451,7 +440,88 @@ class PaymentController extends AbstractController
 
         return new JsonResponse($response);
 
+    }*/
+    #[Route('/callback', name: 'callback', methods: ['POST'])]
+function callBack(
+    Request $request,
+    EntityManagerInterface $entityManager,
+    AppTransactionRepository $appTransactionRepository
+) {
+    // Log: Callback reçu
+    error_log('Callback reçu !');
+
+    // Vérification de l'IP de CoolPay
+    $senderIp = $request->getClientIp();
+    $expectedIp = '15.236.140.89';
+
+    error_log('IP reçue du callback : ' . $senderIp);
+
+    if ($senderIp !== $expectedIp) {
+        error_log('IP non autorisée : ' . $senderIp);
+        return new JsonResponse(['message' => 'Unauthorized sender IP'], Response::HTTP_FORBIDDEN);
     }
+
+    // Décodage des données JSON reçues
+    $jsonData = json_decode($request->getContent(), true);
+    error_log('JSON Callback reçu : ' . json_encode($jsonData));
+
+    if ($jsonData === null) {
+        error_log('Données JSON invalides !');
+        return new JsonResponse(['message' => 'Invalid JSON data'], Response::HTTP_BAD_REQUEST);
+    }
+
+    // Vérification de la présence du champ 'app_transaction_ref'
+    if (!isset($jsonData['app_transaction_ref'])) {
+        error_log('Clé app_transaction_ref absente dans JSON !');
+        return new JsonResponse(['message' => 'Missing app_transaction_ref in JSON'], Response::HTTP_BAD_REQUEST);
+    }
+
+    // Recherche de la transaction dans la base
+    error_log('Recherche transaction avec ref : ' . $jsonData['app_transaction_ref']);
+    $transaction = $appTransactionRepository->findOneBy(['app_transaction_ref' => $jsonData['app_transaction_ref']]);
+
+    if ($transaction === null) {
+        error_log('Transaction introuvable en base avec ref : ' . $jsonData['app_transaction_ref']);
+        return new JsonResponse(['message' => 'Invalid app_transaction_ref data'], Response::HTTP_BAD_REQUEST);
+    }
+
+    // Mise à jour du statut de la transaction
+    error_log('Ancien statut : ' . $transaction->getStatus());
+    $transaction->setStatus($jsonData['transaction_status']);
+    $transaction->setUpdateAt(new \DateTimeImmutable());
+
+    // Sauvegarde en base
+    $entityManager->flush();
+    error_log('Nouveau statut après flush : ' . $transaction->getStatus());
+
+    // Notification à Kulmapeck
+    $redirectUrl = 'https://kulmapeck.com/api/pay/callback/?transaction_ref='
+        . urlencode($jsonData['transaction_ref']) . '&status=' . urlencode($jsonData['transaction_status']);
+
+    error_log('Notifying Kulmapeck : ' . $redirectUrl);
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $redirectUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+    // Exécution de la requête
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    // Vérification des erreurs cURL
+    if (curl_errno($ch)) {
+        error_log('cURL error: ' . curl_error($ch));
+    } else {
+        error_log('Réponse reçue de Kulmapeck (HTTP ' . $httpCode . '): ' . $response);
+    }
+
+    // Fermeture de la connexion cURL
+    curl_close($ch);
+
+    return new JsonResponse(['message' => 'Callback traité avec succès']);
+}
+
 
     #[Route('/balance', name: 'balance', methods: ['POST'])]
     function getBalance()
