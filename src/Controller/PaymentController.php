@@ -448,57 +448,66 @@ function callBack(
     AppTransactionRepository $appTransactionRepository
 ) {
     // Log: Callback reçu
-    error_log('Callback reçu !');
+    var_dump('Callback reçu !');
 
     // Vérification de l'IP de CoolPay
-    $senderIp = $request->getClientIp();
+   /* $senderIp = $request->getClientIp();
     $expectedIp = '15.236.140.89';
 
     var_dump('IP reçue du callback : ' . $senderIp);
 
     if ($senderIp !== $expectedIp) {
-        var_dump('IP non autorisée : ' . $senderIp);
         return new JsonResponse(['message' => 'IP de l\'expéditeur non autorisé'], Response::HTTP_FORBIDDEN);
+    }*/
+    $senderIp = $request->getClientIp();
+    $allowedIps = [
+        '15.236.140.89', // IPv4
+        '2a02:4780:41:dbbd::1' // IPv6
+    ];
+    
+    if (!in_array($senderIp, $allowedIps)) {
+        var_dump('IP non autorisée : ' . $senderIp);
+        return new JsonResponse(['message' => 'IP de l\'expéditeur non autorisée'], Response::HTTP_FORBIDDEN);
     }
 
     // Décodage des données JSON reçues
     $jsonData = json_decode($request->getContent(), true);
-    error_log('JSON Callback reçu : ' . json_encode($jsonData));
+    var_dump('JSON Callback reçu : ' . json_encode($jsonData));
 
     if ($jsonData === null) {
-        error_log('Données JSON invalides !');
+        var_dump('Données JSON invalides !');
         return new JsonResponse(['message' => 'Invalid JSON data'], Response::HTTP_BAD_REQUEST);
     }
 
     // Vérification de la présence du champ 'app_transaction_ref'
     if (!isset($jsonData['app_transaction_ref'])) {
-        error_log('Clé app_transaction_ref absente dans JSON !');
+        var_dump('Clé app_transaction_ref absente dans JSON !');
         return new JsonResponse(['message' => 'Missing app_transaction_ref in JSON'], Response::HTTP_BAD_REQUEST);
     }
 
     // Recherche de la transaction dans la base
-    error_log('Recherche transaction avec ref : ' . $jsonData['app_transaction_ref']);
+    var_dump('Recherche transaction avec ref : ' . $jsonData['app_transaction_ref']);
     $transaction = $appTransactionRepository->findOneBy(['app_transaction_ref' => $jsonData['app_transaction_ref']]);
 
     if ($transaction === null) {
-        error_log('Transaction introuvable en base avec ref : ' . $jsonData['app_transaction_ref']);
+        var_dump('Transaction introuvable en base avec ref : ' . $jsonData['app_transaction_ref']);
         return new JsonResponse(['message' => 'Invalid app_transaction_ref data'], Response::HTTP_BAD_REQUEST);
     }
 
     // Mise à jour du statut de la transaction
-    error_log('Ancien statut : ' . $transaction->getStatus());
+    var_dump('Ancien statut : ' . $transaction->getStatus());
     $transaction->setStatus($jsonData['transaction_status']);
     $transaction->setUpdateAt(new \DateTimeImmutable());
 
     // Sauvegarde en base
     $entityManager->flush();
-    error_log('Nouveau statut après flush : ' . $transaction->getStatus());
+    var_dump('Nouveau statut après flush : ' . $transaction->getStatus());
 
     // Notification à Kulmapeck
     $redirectUrl = 'https://kulmapeck.com/api/pay/callback/?transaction_ref='
         . urlencode($jsonData['transaction_ref']) . '&status=' . urlencode($jsonData['transaction_status']);
 
-    error_log('Notifying Kulmapeck : ' . $redirectUrl);
+    var_dump('Notifying Kulmapeck : ' . $redirectUrl);
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $redirectUrl);
@@ -511,9 +520,9 @@ function callBack(
 
     // Vérification des erreurs cURL
     if (curl_errno($ch)) {
-        error_log('cURL error: ' . curl_error($ch));
+        var_dump('cURL error: ' . curl_error($ch));
     } else {
-        error_log('Réponse reçue de Kulmapeck (HTTP ' . $httpCode . '): ' . $response);
+        var_dump('Réponse reçue de Kulmapeck (HTTP ' . $httpCode . '): ' . $response);
     }
 
     // Fermeture de la connexion cURL
