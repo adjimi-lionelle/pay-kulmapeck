@@ -505,7 +505,7 @@ function callBack(
 
     // Notification à Kulmapeck
     $redirectUrl = 'https://kulmapeck.com/api/pay/callback/?transaction_ref='
-        . urlencode($jsonData['transaction_ref']) . '&status=' . urlencode($jsonData['transaction_status']);
+        . urlencode($jsonData['app_transaction_ref']) . '&status=' . urlencode($jsonData['transaction_status']);
 
     var_dump('Notifying Kulmapeck : ' . $redirectUrl);
 
