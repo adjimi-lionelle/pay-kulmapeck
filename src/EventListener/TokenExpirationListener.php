@@ -30,7 +30,7 @@ class TokenExpirationListener implements EventSubscriberInterface
         $this->tokenStorage = $apiKeys->getAPIToken();
         $this->jwtTokenManager = $jwtTokenManager;
         $this->userRepository = $userRepository;
-        $this->logger = $logger;
+       // $this->logger = $logger;
     }
 
     public function onKernelRequest(RequestEvent $event)
@@ -64,12 +64,12 @@ class TokenExpirationListener implements EventSubscriberInterface
             // Compare the header value with the stored private key
             if ($headerValue !== $this->tokenStorage) {
                 // Unauthorized response
-                throw new AccessDeniedHttpException('Access Denied: User not authenticated.');
+                throw new AccessDeniedHttpException('Access Denied: User no connect.');
             }
             return;
         }
         $authHeader = $request->headers->get('Authorization', 'No Authorization Header');
-          $this->logger->info('Authorization Header: ' . $authHeader);
+         /// $this->logger->info('Authorization Header: ' . $authHeader);
 
         // Check if the user is authenticated with a valid token
         if (!$this->isUserAuthenticated($request)) {
