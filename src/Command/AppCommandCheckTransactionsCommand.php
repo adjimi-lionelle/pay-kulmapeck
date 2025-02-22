@@ -12,21 +12,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'AppCommandCheckTransactionsCommand',
-    description: 'Add a short description for your command',
+    description: 'verifier et mettre a jour letat des transactions',
 )]
 class AppCommandCheckTransactionsCommand extends Command
 {
     public function __construct()
     {
         parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this
-            ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description')
-        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
