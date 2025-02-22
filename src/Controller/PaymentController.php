@@ -104,7 +104,6 @@ class PaymentController extends AbstractController
 
         // Build the data for the cURL request
         $data = $this->buildPayInFromArray($requestData);
-        $data['callback_url'] = 'https://staging-kulmapeck.online/api/pay/callback';
         // Initialize a new cURL handle
         $curl = curl_init();
 
@@ -142,8 +141,6 @@ class PaymentController extends AbstractController
             $transaction->setUpdateAt(new \DateTimeImmutable());
             $transaction->setAppTransactionRef($transaction_ref);
             $entityManager->persist($transaction);
-            $entityManager->flush();
-
             $entityManager->flush();
             return new JsonResponse($responseData, Response::HTTP_ACCEPTED);
         } else {

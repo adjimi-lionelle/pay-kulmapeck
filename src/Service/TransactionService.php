@@ -75,7 +75,7 @@ class TransactionService
             return ['message' => 'Statut mis à jour', 'status' => $responseData['transaction_status'], 'code' => 200];
 
         } catch (\Exception $e) {
-            $this->logger->error("Erreur API lors de la vérification de la transaction {$transactionId}: " . $e->getMessage());
+          //  $this->logger->error("Erreur API lors de la vérification de la transaction {$transactionId}: " . $e->getMessage());
             return ['message' => 'Erreur lors de la vérification de la transaction', 'error' => $e->getMessage(), 'code' => 500];
         }
     }
