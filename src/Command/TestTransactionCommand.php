@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name: 'app:test-transaction',
+    name: 'app:add-transaction',
     description: 'Test d\'ajout d\'une transaction en base de données.',
 )]
 class TestTransactionCommand extends Command
