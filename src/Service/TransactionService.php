@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Psr\Log\LoggerInterface;
+use App\Service\ApiKeys;
 
 class TransactionService
 {
@@ -21,13 +22,14 @@ class TransactionService
         HttpClientInterface $httpClient,
         EntityManagerInterface $entityManager,
         AppTransactionRepository $appTransactionRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ApiKeys $apiKeys = null
     ) {
         $this->httpClient = $httpClient;
         $this->entityManager = $entityManager;
         $this->appTransactionRepository = $appTransactionRepository;
         $this->logger = $logger;
-        $this->publicKey = "VOTRE_PUBLIC_KEY"; // Remplace avec ta clé publique My-CoolPay
+        $this->publicKey = $apiKeys->getPublicKey();; // Remplace avec ta clé publique My-CoolPay
     }
 
     /**
