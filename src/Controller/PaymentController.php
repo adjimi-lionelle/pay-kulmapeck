@@ -15,33 +15,34 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Psr\Log\LoggerInterface;
 
 #[Route('/api/pay')]
 class PaymentController extends AbstractController
 {
     private $publicKey;
     private $privateKey;
-
     private $cacert;
 
     private $percentageInt;
     private $percentageOut;
     private $percentageOutTeach;
+    private LoggerInterface $logger;
 
-    public function __construct(ApiKeys $apiKeys = null)
+
+    public function __construct(ApiKeys $apiKeys = null,  LoggerInterface $logger)
     {
         $this->privateKey = $apiKeys->getPrivateKey();
         $this->publicKey = $apiKeys->getPublicKey();
         $this->cacert = $apiKeys->getCacert();
+        $this->logger = $logger;
 
         $this->percentageInt = 1.8;
         $this->percentageOut = 0.5;
         $this->percentageOutTeach = 1;
 
     }
-    /**
-     * Paiement par les eleves ou client de kulmapeck vers coolpay
-     */
+    
 
     #[Route('/in', name: 'app_pay_in', methods: ['POST'])]
 
@@ -104,6 +105,7 @@ class PaymentController extends AbstractController
 
         // Build the data for the cURL request
         $data = $this->buildPayInFromArray($requestData);
+        $data['callback_url'] = 'https://staging-kulmapeck.online/api/pay/callback';
         // Initialize a new cURL handle
         $curl = curl_init();
 
@@ -155,6 +157,154 @@ class PaymentController extends AbstractController
         }
 
     }
+
+   
+    /*
+    #[Route('/in', name: 'app_pay_in', methods: ['POST'])]
+    public function payIn(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        AppTransactionRepository $appTransactionRepository
+    ): JsonResponse {
+        $url = 'https://my-coolpay.com/api/' . $this->publicKey . '/paylink';
+        $headers = [
+            'Content-Type: application/json',
+            'Accept: application/json',
+        ];
+
+        $requestData = json_decode($request->getContent(), true);
+        $enterpriseToken = $request->headers->get('X-PRIVATE-KEY');
+
+        if ($requestData === null) {
+            return new JsonResponse(['message' => 'Invalid JSON data'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $transaction = new AppTransaction();
+
+        $existBank = $entityManager->getRepository(AppBank::class)
+            ->findOneBy(['bankCode' => $requestData['transaction_operator']]);
+
+        $existEnterprise = $entityManager->getRepository(AppEnterprise::class)
+            ->findOneBy(['enterpriseToken' => $enterpriseToken]);
+
+        if (!$existEnterprise) {
+            return $this->json(['error' => 'This Enterprise doesn\'t exist'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $transaction->setAmount($requestData['transaction_amount']);
+        $transaction->setTransactionCurrency($requestData['transaction_currency']);
+        $transaction->setStatus('PENDING');
+        $transaction->setReceiver($requestData['transaction_receiver']);
+        $transaction->setSender($requestData['customer_phone_number']);
+        $transaction->setType('payIn');
+        $transaction->setTransactionReason($requestData['transaction_reason']);
+        $transaction->setCustomerName($requestData['customer_name']);
+        $transaction->setCreatAt(new \DateTimeImmutable());
+        $transaction->setUpdateAt(new \DateTimeImmutable());
+        $transaction->setEnterprise($existEnterprise);
+        $transaction->setBank($existBank);
+        $entityManager->persist($transaction);
+        $entityManager->flush();
+
+        // Ajouter l'URL du callback pour la notification automatique
+        $data = $requestData;
+        $data['callback_url'] = 'https://staging-kulmapeck.online/api/pay/callback';
+
+        // Envoyer la requête vers My-CoolPay
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($curl, CURLOPT_CAINFO, $this->cacert);
+        $response = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        if (curl_errno($curl)) {
+            $this->logger->error("Erreur cURL : " . curl_error($curl));
+            curl_close($curl);
+            return new JsonResponse(['message' => 'Erreur lors du paiement'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        curl_close($curl);
+        $responseData = json_decode($response, true);
+
+        if (isset($responseData['transaction_ref'])) {
+            $transaction_ref = $responseData['transaction_ref'];
+
+            // Mise à jour avec la référence de transaction
+            $transaction->setAppTransactionRef($transaction_ref);
+            $transaction->setUpdateAt(new \DateTimeImmutable());
+            $entityManager->flush();
+
+            // Vérification immédiate du statut de la transaction après 5 secondes
+            sleep(5); 
+            $this->checkTransactionStatus($transaction_ref, $entityManager, $appTransactionRepository);
+
+            return new JsonResponse($responseData, Response::HTTP_ACCEPTED);
+        } else {
+            $transaction->setStatus('FAILED');
+            $transaction->setUpdateAt(new \DateTimeImmutable());
+            $entityManager->flush();
+            return new JsonResponse($responseData, Response::HTTP_BAD_REQUEST);
+        }
+    }
+
+    // Vérifier le statut de la transaction après un paiement
+    /*public function checkTransactionStatus(
+        string $transactionId,
+        EntityManagerInterface $entityManager,
+        AppTransactionRepository $appTransactionRepository
+    ) {
+        $url = 'https://my-coolpay.com/api/' . $this->publicKey . '/checkStatus/' . $transactionId;
+        $headers = ['Accept: application/json'];
+
+        $transaction = $appTransactionRepository->findOneBy(['app_transaction_ref' => $transactionId]);
+
+        if (!$transaction) {
+            $this->logger->warning("Transaction non trouvée : {$transactionId}");
+            return ['message' => 'Transaction non trouvée', 'code' => 400];
+        }
+
+        // Initialisation de cURL
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_CAINFO, $this->cacert);
+        $response = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        $responseData = json_decode($response, true);
+
+        if (isset($responseData['transaction_status'])) {
+            $transaction->setStatus($responseData['transaction_status']);
+            $transaction->setUpdateAt(new \DateTimeImmutable());
+            $entityManager->flush();
+
+            // Redirection vers kulmapeck.com après mise à jour
+            $redirectUrl = 'https://kulmapeck.com/api/pay/callback/?transaction_ref='
+                . urlencode($responseData['app_transaction_ref']) . '&status=' . urlencode($responseData['transaction_status']);
+
+            $chRedirect = curl_init($redirectUrl);
+            curl_setopt($chRedirect, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($chRedirect, CURLOPT_FOLLOWLOCATION, true);
+            $redirectResponse = curl_exec($chRedirect);
+
+            if (curl_errno($chRedirect)) {
+                $this->logger->error("Erreur cURL lors de la redirection vers Kulmapeck : " . curl_error($chRedirect));
+            } else {
+                $this->logger->info("Redirection vers Kulmapeck réussie pour {$transactionId}");
+            }
+
+            curl_close($chRedirect);
+
+            return ['message' => 'Statut mis à jour et redirection effectuée', 'status' => $responseData['transaction_status'], 'code' => 200];
+        } else {
+            return ['message' => 'Transaction status retrieval failed', 'code' => $httpCode];
+        }
+    }*/
 
     /**
      * Retrait par les Enseignants ou client de Coolpay vers Kulmapeck
@@ -302,11 +452,12 @@ class PaymentController extends AbstractController
         $headers = [
             'Accept: application/json',
         ];
-        $transaction = new AppTransaction();
+        //$transaction = new AppTransaction();
 
         $transaction = $appTransactionRepository->findOneBy(['app_transaction_ref' => $transactionId]);
-        if ($transaction === null) {
-            return new JsonResponse(['message' => 'Invalid app_transaction_ref data'], Response::HTTP_BAD_REQUEST);
+        if (!$transaction) {
+            $this->logger->warning("Transaction non trouvée : {$transactionId}");
+            return ['message' => 'Transaction non trouvée', 'code' => 400];
         }
 
         $curl = curl_init($url);
@@ -329,7 +480,7 @@ class PaymentController extends AbstractController
             $entityManager->flush();
 
             $redirectUrl = 'https://kulmapeck.com/api/pay/callback/?transaction_ref='
-            . urlencode($responseData['transaction_ref']) . '&status=' . urlencode($responseData['transaction_status']);
+            . urlencode($responseData['app_transaction_ref']) . '&status=' . urlencode($responseData['transaction_status']);
 
             $ch = curl_init();
 
@@ -418,7 +569,7 @@ class PaymentController extends AbstractController
         $entityManager->flush();
 
         $redirectUrl = 'https://kulmapeck.com/api/pay/callback/?transaction_ref='
-        . urlencode($jsonData['transaction_ref']) . '&status=' . urlencode($jsonData['transaction_status']);
+        . urlencode($jsonData['app_transaction_ref']) . '&status=' . urlencode($jsonData['transaction_status']);
 
         $ch = curl_init();
      
