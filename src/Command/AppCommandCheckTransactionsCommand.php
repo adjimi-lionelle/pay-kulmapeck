@@ -9,6 +9,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use App\Repository\AppTransactionRepository;
+use App\Service\TransactionService;
 
 #[AsCommand(
     name: 'app:test-transactions',
@@ -16,36 +18,23 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class AppCommandCheckTransactionsCommand extends Command
 {
-    public function __construct()
+    private TransactionService $transactionService;
+    private AppTransactionRepository $appTransactionRepository;
+
+    public function __construct(TransactionService $transactionService, AppTransactionRepository $appTransactionRepository)
     {
         parent::__construct();
+        $this->transactionService = $transactionService;
+        $this->appTransactionRepository = $appTransactionRepository;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $url = 'https://staging-kulmapeck.online/api/pay/recall';
+        $transactions = $this->appTransactionRepository->findBy(['status' => 'PENDING']);
 
-        // Initialize cURL session
-        $ch = curl_init();
-
-        // Set cURL options
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        // Execute cURL request and store the response
-        $response = curl_exec($ch);
-
-        // Check for cURL errors
-        if (curl_errno($ch)) {
-            $output->writeln('cURL error: ' . curl_error($ch));
-            return Command::FAILURE;
+        foreach ($transactions as $transaction) {
+            $this->transactionService->checkTransactionStatus($transaction->getAppTransactionRef());
         }
-
-        // Close cURL session
-        curl_close($ch);
-
-        // Display the response
-        $output->writeln("Response: $response");
 
         return Command::SUCCESS;
     }
