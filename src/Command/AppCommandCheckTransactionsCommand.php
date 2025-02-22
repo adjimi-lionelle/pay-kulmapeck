@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name: 'AppCommandCheckTransactionsCommand',
+    name: 'app:test-transactions',
     description: 'verifier et mettre a jour letat des transactions',
 )]
 class AppCommandCheckTransactionsCommand extends Command
