@@ -137,7 +137,7 @@ class PaymentController extends AbstractController
             $transaction_ref = $responseData['transaction_ref'];
             $paymentUrl = $responseData['payment_url'];
 
-            $transaction->setStatus('SUCCESS');
+            $transaction->setStatus('PENDING');
             $transaction->setUpdateAt(new \DateTimeImmutable());
             $transaction->setAppTransactionRef($transaction_ref);
             $entityManager->persist($transaction);
