@@ -23,7 +23,7 @@ class TransactionService
         EntityManagerInterface $entityManager,
         AppTransactionRepository $appTransactionRepository,
         LoggerInterface $logger,
-        ApiKeys $apiKeys = null
+        ?ApiKeys $apiKeys = null
     ) {
         $this->httpClient = $httpClient;
         $this->entityManager = $entityManager;

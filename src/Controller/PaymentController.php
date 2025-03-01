@@ -28,7 +28,7 @@ class PaymentController extends AbstractController
     private $percentageOut;
     private $percentageOutTeach;
 
-    public function __construct(ApiKeys $apiKeys = null)
+    public function __construct(?ApiKeys $apiKeys = null)
     {
         $this->privateKey = $apiKeys->getPrivateKey();
         $this->publicKey = $apiKeys->getPublicKey();
@@ -120,10 +120,10 @@ class PaymentController extends AbstractController
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
         // Check for cURL errors
-        if (curl_errno($curl)) {
+      /*  if (curl_errno($curl)) {
             $error = curl_error($curl);
             dump($error);
-        }
+        }*/
 
         // Close the cURL handle
         curl_close($curl);
@@ -137,7 +137,7 @@ class PaymentController extends AbstractController
             $transaction_ref = $responseData['transaction_ref'];
             $paymentUrl = $responseData['payment_url'];
 
-            $transaction->setStatus('PENDING');
+            $transaction->setStatus('SUCCESS');
             $transaction->setUpdateAt(new \DateTimeImmutable());
             $transaction->setAppTransactionRef($transaction_ref);
             $entityManager->persist($transaction);

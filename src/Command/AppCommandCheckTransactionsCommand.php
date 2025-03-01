@@ -30,7 +30,12 @@ class AppCommandCheckTransactionsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $transactions = $this->appTransactionRepository->findBy(['status' => 'PENDING']);
+       // $transactions = $this->appTransactionRepository->findBy(['status' => 'PENDING']);
+        $transactions = $this->appTransactionRepository->createQueryBuilder('t')
+        ->where('t.status IN (:statuses)')
+        ->setParameter('statuses', ['CREATED', 'PENDING'])
+        ->getQuery()
+        ->getResult();
 
         foreach ($transactions as $transaction) {
             $this->transactionService->checkTransactionStatus($transaction->getAppTransactionRef());
