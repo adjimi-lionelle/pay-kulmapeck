@@ -69,8 +69,6 @@ class TransactionService
 
             if ($responseData['transaction_status'] === 'SUCCESS') {
                 $this->notifyKulmapeck($transactionId, $responseData['transaction_status']);
-            }else{
-                echo "pas de comunication à kulmapeck";
             }
 
             return ['message' => 'Statut mis à jour', 'status' => $responseData['transaction_status'], 'code' => 200];
