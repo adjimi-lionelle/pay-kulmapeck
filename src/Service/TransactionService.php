@@ -67,9 +67,7 @@ class TransactionService
             $transaction->setUpdateAt(new \DateTimeImmutable());
             $this->entityManager->flush();
 
-            if ($responseData['transaction_status'] === 'SUCCESS') {
                 $this->notifyKulmapeck($transactionId, $responseData['transaction_status']);
-            }
 
             return ['message' => 'Statut mis à jour', 'status' => $responseData['transaction_status'], 'code' => 200];
 
