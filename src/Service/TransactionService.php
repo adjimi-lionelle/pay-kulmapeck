@@ -67,14 +67,11 @@ class TransactionService
             $transaction->setUpdateAt(new \DateTimeImmutable());
             $this->entityManager->flush();
 
-            $this->logger->info("Transaction mise à jour : {$transactionId} - Statut : {$responseData['transaction_status']}");
-          //  $updatedTransaction = $this->appTransactionRepository->findOneBy(['app_transaction_ref' => $transactionId]);
-
-    //var_dump($updatedTransaction->getStatus()) ;
-
-
-            // Notifier Kulmapeck après la mise à jour du statut
-         //   $this->notifyKulmapeck($transactionId, $responseData['transaction_status']);
+            if ($responseData['transaction_status'] === 'SUCCESS') {
+                $this->notifyKulmapeck($transactionId, $responseData['transaction_status']);
+            }else{
+                echo "pas de comunication à kulmapeck";
+            }
 
             return ['message' => 'Statut mis à jour', 'status' => $responseData['transaction_status'], 'code' => 200];
 
