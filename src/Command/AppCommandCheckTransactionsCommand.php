@@ -38,14 +38,10 @@ class AppCommandCheckTransactionsCommand extends Command
        ->getQuery()
        ->getResult();
 
-       $i = 1;
-
        if(count($transactions) > 0)
        {
         foreach ($transactions as $transaction) {
-            echo $transaction->getStatus().$i . " ";
-            $i++ ;
-            //$this->transactionService->checkTransactionStatus($transaction->getAppTransactionRef());
+            $this->transactionService->checkTransactionStatus($transaction->getAppTransactionRef());
         }
        }
    

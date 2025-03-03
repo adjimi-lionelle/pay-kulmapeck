@@ -68,13 +68,13 @@ class TransactionService
             $this->entityManager->flush();
 
             $this->logger->info("Transaction mise à jour : {$transactionId} - Statut : {$responseData['transaction_status']}");
-            $updatedTransaction = $this->appTransactionRepository->findOneBy(['app_transaction_ref' => $transactionId]);
+          //  $updatedTransaction = $this->appTransactionRepository->findOneBy(['app_transaction_ref' => $transactionId]);
 
     //var_dump($updatedTransaction->getStatus()) ;
 
 
             // Notifier Kulmapeck après la mise à jour du statut
-            $this->notifyKulmapeck($transactionId, $responseData['transaction_status']);
+         //   $this->notifyKulmapeck($transactionId, $responseData['transaction_status']);
 
             return ['message' => 'Statut mis à jour', 'status' => $responseData['transaction_status'], 'code' => 200];
 
